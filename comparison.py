@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 
 from gensim.matutils import Sparse2Corpus
-from gensim.models.ldamodel import LdaModel
+from ldamodel import LdaModel
 from gensim.models.ldamulticore import LdaMulticore
 
 logging.basicConfig(
