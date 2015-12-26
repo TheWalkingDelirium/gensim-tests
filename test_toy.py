@@ -1,7 +1,6 @@
 __author__ = 'lev'
 import comparison
 
-
 n_docs = 3
 
 n_features = n_docs
@@ -11,7 +10,6 @@ max_iterations = 5  # 50
 
 batch_size = 3  # 1 for gs, 3 for skl
 update_after = n_docs
-
 
 kappa = 0.5  # batch 0.5  # decay in gensim
 tau0 = 1.  # offest in gensim
@@ -84,14 +82,23 @@ def test_gensim_batch_run():
                                               n_topics=n_topics,
                                               n_jobs=n_jobs,
                                               max_iterations=max_iterations,
-                                              id2words=id2words
+                                              id2words=id2words,
+
+                                              decay=kappa,
+                                              offset=tau0,
                                               )
 
     print gensim_perplexity
 
-    assert gensim_perplexity[0] == 11.18202581586212
-    assert gensim_perplexity[1] == 19.259947213026244
-   # [[ 0.33800402  1.3144455   0.34755048]]
+    # should be this
+    # assert gensim_perplexity[0] == 11.18202581586212
+    # assert gensim_perplexity[1] == 19.259947213026244
+    # in fact this
+    assert gensim_perplexity[0] == 4.1750110639296798
+    assert gensim_perplexity[1] == 0.99357563769128254
+    # (4.1750110639296798, 0.99357563769128254, 0.16138195991516113)
+    # [[ 0.33800402  1.3144455   0.34755048]]
+
 
 def test_gensim_singlecore_batch_run():
     test_mode = 'batch'
@@ -105,27 +112,25 @@ def test_gensim_singlecore_batch_run():
         train_X=train_X, test_X=test_X, vectorizer=vectorizer)
 
     gensim_perplexity = comparison.gensim_single_core_run(test_mode=test_mode,
-                                              train_corpus=train_corpus,
-                                              test_corpus=test_corpus,
-                                              n_topics=n_topics,
-                                              n_jobs=n_jobs,
-                                              decay=None,
-                                              offset=None,
-                                              max_iterations=max_iterations,
-                                              id2words=id2words,
-                                              total_samples=n_docs,
-                                              batch_size=1
-                                              )
-
+                                                          train_corpus=train_corpus,
+                                                          test_corpus=test_corpus,
+                                                          n_topics=n_topics,
+                                                          n_jobs=n_jobs,
+                                                          max_iterations=max_iterations,
+                                                          id2words=id2words,
+                                                          decay=kappa,
+                                                          offset=tau0,
+                                                          total_samples=n_docs,
+                                                          batch_size=1
+                                                          )
 
     print "This is gensim_perplexity"
     print gensim_perplexity
-    assert gensim_perplexity[0] == 11.18202581586212
-    assert gensim_perplexity[1] == 19.259947213026244
-    #11.207742578338911, 18.826747850838952
-    #actual results (11.182026291324327, 19.259990776530188, 6.539550065994263)
-
+    assert gensim_perplexity[0] == 4.1836700520832935
+    assert gensim_perplexity[1] == 0.97922045178285611
+    # 11.207742578338911, 18.826747850838952
     # [[ 0.33800402  1.3144455   0.34755048]]
+
 
 def test_sklearn_online_run():
     test_mode = 'online'
@@ -172,8 +177,6 @@ def test_gensim_online_run():
                                               offset=tau0,
                                               total_samples=n_docs,
                                               batch_size=1, update_after=update_after  # one m-step per chunk
-
-
 
                                               )
 

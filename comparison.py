@@ -1,17 +1,13 @@
 from time import time
 import logging
 import numpy as np
-import pandas as pd
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 
-"""from gensim.matutils import Sparse2Corpus"""
 from gensim.matutils import Sparse2Corpus
-from ldamodel import LdaModel
-from ldamulticore import LdaMulticore
-"""from gensim.models.ldamodel import LdaModel
-from gensim.models.ldamulticore import LdaMulticore"""
+from gensim.models.ldamodel import LdaModel
+from gensim.models.ldamulticore import LdaMulticore
 
 logging.basicConfig(
     format='%(asctime)s : %(levelname)s : %(message)s',
@@ -206,7 +202,7 @@ def gensim_run(test_mode=None,
         num_topics=n_topics,
         passes=max_iterations,
         chunksize=batch_size,
-        updateafter=update_after,
+       # updateafter=update_after, <- unexpected argument
         iterations=max_e_steps,
         eval_every=eval_every)  # how to pass total_samples?
 
@@ -238,8 +234,6 @@ def gensim_single_core_run(test_mode=None,
                            offset=None,
                            total_samples=None,
                            batch_size=None, update_after=None
-
-
                            ):
 
     np.random.seed(0)
@@ -249,37 +243,19 @@ def gensim_single_core_run(test_mode=None,
 
     t0 = time()
 
-    # lda_gensim = LdaModel(
-    #     train_corpus,
-    #     id2word=id2words,
-    #     decay=decay,
-    #     offset=offset,
-    #     num_topics=n_topics,
-    #     passes=max_iterations,
-    #     chunksize=batch_size,
-    #     iterations=max_e_steps,
-    #     eval_every=eval_every)  # how to pass total_samples?
-
     #George Dausheyev: update every set to 0, so it will run LdaModel.update() in batch mode
     lda_gensim = LdaModel(
         train_corpus,
-        num_topics=n_topics,
         id2word=id2words,
-        distributed=False,
-        chunksize=batch_size,
-        update_every=0,
         decay=decay,
         offset=offset,
+        num_topics=n_topics,
         passes=max_iterations,
+        chunksize=batch_size,
+        update_every=0,
         iterations=max_e_steps,
         eval_every=eval_every)  # how to pass total_samples?
 
-       #
-       # corpus=None, num_topics=100, id2word=None,
-       #           distributed=False, chunksize=2000, passes=1, update_every=1,
-       #           alpha='symmetric', eta=None, decay=0.5, offset=1.0,
-       #           eval_every=10, iterations=50, gamma_threshold=0.001,
-       #           minimum_probability=0.01):
     gs_time = (time() - t0)
     print("gensim sc done in %0.3fs." % (time() - t0))
 
